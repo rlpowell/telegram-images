@@ -1,5 +1,7 @@
 /target/
+/telegram_database/
 /output/
+Settings.toml
 
 # Vim
 [._]*.sw[a-p]
