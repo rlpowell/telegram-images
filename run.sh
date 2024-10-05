@@ -10,17 +10,13 @@ __error_trapper() {
 trap '__error_trapper "${LINENO}/${BASH_LINENO}" "$?" "$BASH_COMMAND"' ERR
 
 set -euE -o pipefail
+shopt -s failglob
 
 # Cron's path tends to suck
 export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:$HOME/bin:$HOME/.local/bin
 
 selfdir="$(readlink -f "$(dirname "$0")")"
 cd "$selfdir"
-
-(
-  cd ~/src/lunarvim_rust/
-  podman build -t lunarvim_rust .
-)
 
 podman build -t telegram_images .
 
@@ -36,11 +32,13 @@ mkdir output
 
 echo "running file extractor"
 # See https://github.com/xd009642/tarpaulin/issues/1087 for the seccomp thing
-podman run --rm --name telegram-images --security-opt seccomp=~/src/lunarvim_rust/seccomp.json -w /root/src/telegram-images \
+podman run --rm --name telegram-images --security-opt seccomp=~/src/neovim_rust/seccomp.json -w /root/src/telegram-images \
   -v ~/src:/root/src -v ~/.local/rust_docker_cargo-telegram-images:/root/.cargo \
-  -v ~/config/dotfiles/lunarvim:/root/.config/lvim  -v ~/config/dotfiles/bashrc:/root/.bashrc \
+  -v ~/config/dotfiles/nvim:/root/.config/nvim  -v ~/config/dotfiles/bashrc:/root/.bashrc \
   -v ~/config/dotfiles/bothrc:/root/.bothrc \
   -it telegram_images cargo run "$@"
 
 echo "copying images"
 rsync -av output/ ~/Dropbox/Pictures/ZF_Prep/Telegram_Files/
+
+echo "telegram images run complete"
