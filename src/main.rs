@@ -125,9 +125,9 @@ async fn my_download_file(
             if filemess.file().local().is_downloading_completed() {
                 log::debug!("file message received: {:?}", filemess);
                 let new_filename = format!(
-                    "output/{}--{}_Telegram_{}_{}",
-                    date_time.format("%Y-%m-%d_%H-%M-%S"),
+                    "output/{}_Telegram_sent_{}_from_{}_filename_{}",
                     file_type,
+                    date_time.format("%Y-%m-%d_%H-%M-%S"),
                     slugify(chat_title),
                     Path::new(filemess.file().local().path())
                         .file_name()
